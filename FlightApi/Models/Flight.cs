@@ -10,5 +10,9 @@ namespace FlightApi.Models
         public long Id { get; set; }
         //public string Name { get; set; }
         public string Destination { get; set; }
+        public string Origin { get; set; }
+        public string DepartDate { get; set; }
+        public string ReturnDate { get; set; }
+        public string NumberOfChanges { get; set; }
     }
 }

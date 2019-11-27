@@ -50,18 +50,21 @@ namespace FlightApi.Controllers
             HttpClient client = new HttpClient();
             string response = await client.GetStringAsync(path);
             var datas = JObject.Parse(response)["data"]["prices"];
-            List
-            foreach (JToken i in datas) {
-                
-                string desti = JObject.Parse(response)["data"]["prices"][i]["dtestination"].ToString();
-            }
+            string debugString = JObject.Parse(response)["data"]["prices"].ToString();
+
+
             //string name = data.Property("airline").Value.ToString
-            //Flight flight = new Flight();
+            Flight flight = new Flight();
             //flight.Destination = data.Property("destination").Value.ToString();
-            //_context.Flights.Add(flight);
+            flight.Destination = datas[0]["destination"].ToString();
+            flight.Origin = datas[0]["origin"].ToString();
+            flight.DepartDate = datas[0]["depart_date"].ToString();
+            flight.ReturnDate = datas[0]["return_date"].ToString();
+            flight.NumberOfChanges = datas[0]["number_of_changes"].ToString();
+
+            _context.Flights.Add(flight);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetFlight), new { id = flight.Id }, flight);
-
         }
 
         // GET: api/Flights/5
