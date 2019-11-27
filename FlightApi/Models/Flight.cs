@@ -8,6 +8,7 @@ namespace FlightApi.Models
     public class Flight
     {
         public long Id { get; set; }
-        public string Name { get; set; }
+        //public string Name { get; set; }
+        public string Destination { get; set; }
     }
 }
