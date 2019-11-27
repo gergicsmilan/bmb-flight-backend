@@ -43,14 +43,25 @@ namespace FlightApi.Controllers
 
         // GET: api/Flights
         [HttpGet]
-        public async void GetFlights()
+        public async Task<ActionResult<Flight>> GetFlights()
         {
             //string testPath = "http://api.travelpayouts.com/v2/prices/nearest-places-matrix?currency=usd&origin=LED&destination=HKT&show_to_affiliates=true&token=35120b8381d8f9ecea3fbd296b0697c3";
             string path = urlBuilder("BUD", null, null, null, null);
             HttpClient client = new HttpClient();
             string response = await client.GetStringAsync(path);
+            //from backend_basics // 
+            JObject data = (JObject)JObject.Parse(response)["data"];
+            //
             string thing = JObject.Parse(response)["data"].ToString();
+            string name = data.Property("airline").Value.ToString();
+            Flight flight = new Flight();
 
+            flight.Name = name.ToString();
+
+            _context.Flights.Add(flight);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetFlight), new { id = flight.Id }, flight);
         }
 
         // GET: api/Flights/5
