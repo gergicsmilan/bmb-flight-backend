@@ -43,7 +43,7 @@ namespace FlightApi.Controllers
 
         // GET: api/Flights
         [HttpGet]
-        public async Task<ActionResult<Flight>> GetFlights()
+        public async Task<ActionResult<IEnumerable<Flight>>> GetFlights()
         {
 
             string path = urlBuilder("BUD", null, null, null, null);
@@ -51,20 +51,21 @@ namespace FlightApi.Controllers
             string response = await client.GetStringAsync(path);
             var datas = JObject.Parse(response)["data"]["prices"];
             string debugString = JObject.Parse(response)["data"]["prices"].ToString();
+            foreach (var data in datas)
+            {
+                Flight flight = new Flight();
 
+                flight.Destination = data["destination"].ToString();
+                flight.Origin = data["origin"].ToString();
+                flight.DepartDate = data["depart_date"].ToString();
+                flight.ReturnDate = data["return_date"].ToString();
+                flight.NumberOfChanges = data["number_of_changes"].ToString();
 
-            //string name = data.Property("airline").Value.ToString
-            Flight flight = new Flight();
-            //flight.Destination = data.Property("destination").Value.ToString();
-            flight.Destination = datas[0]["destination"].ToString();
-            flight.Origin = datas[0]["origin"].ToString();
-            flight.DepartDate = datas[0]["depart_date"].ToString();
-            flight.ReturnDate = datas[0]["return_date"].ToString();
-            flight.NumberOfChanges = datas[0]["number_of_changes"].ToString();
-
-            _context.Flights.Add(flight);
+                _context.Flights.Add(flight);
+            }
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetFlight), new { id = flight.Id }, flight);
+            return await _context.Flights.ToListAsync();
+            //return CreatedAtAction(nameof(GetFlight), new { id = flight.Id }, flight);
         }
 
         // GET: api/Flights/5
