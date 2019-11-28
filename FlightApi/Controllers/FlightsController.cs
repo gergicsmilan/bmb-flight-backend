@@ -149,8 +149,8 @@ namespace FlightApi.Controllers
 
             string path = urlBuilder(flight.Origin,
                                         flight.Destination,
-                                        null,
-                                        null,
+                                        flight.DepartDate,
+                                        flight.ReturnDate,
                                         null,
                                         null,
                                         null);
@@ -165,7 +165,7 @@ namespace FlightApi.Controllers
             {
                 Flight flightToGiveBack = new Flight();
 
-                flightToGiveBack.value = data["value"].ToString();
+                flightToGiveBack.Value = data["value"].ToString();
                 flightToGiveBack.TripClass = data["trip_class"].ToString();
                 flightToGiveBack.ShowToAffiliates = data["show_to_affiliates"].ToString();
                 flightToGiveBack.ReturnDate = data["return_date"].ToString();
