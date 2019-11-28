@@ -21,8 +21,7 @@ namespace FlightApi.Models
         public string FoundAt { get; set; }
         public string Distance { get; set; }
         public string Duration { get; set; }
-        public string Direction { get; set; }
-        
+
 
     }
 }
