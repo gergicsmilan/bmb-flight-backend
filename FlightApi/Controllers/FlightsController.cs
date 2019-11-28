@@ -33,8 +33,16 @@ namespace FlightApi.Controllers
             UrlSb.Append("http://api.travelpayouts.com/v2/prices/nearest-places-matrix?");
             UrlSb.Append($"origin={origin}&");
             UrlSb.Append($"destination={destination}&");
-            //UrlSb.Append($"depart_date={departDate}&");
-            //UrlSb.Append($"return_date={returnDate}&");
+
+            if (departDate != null)
+            {
+                UrlSb.Append($"depart_date={departDate}&");
+            }
+
+            if (returnDate != null)
+            {
+                UrlSb.Append($"return_date={returnDate}&");
+            }
             //UrlSb.Append($"trip_class={tripClass}&");
             //UrlSb.Append($"sorting={sorting}&");
             //UrlSb.Append($"currency={currency}&");
