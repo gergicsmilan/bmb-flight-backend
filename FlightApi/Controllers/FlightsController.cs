@@ -77,21 +77,6 @@ namespace FlightApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Flight>>> GetFlights()
         {
-            string testPath = "http://api.travelpayouts.com/v2/prices/nearest-places-matrix?currency=usd&origin=BUD&destination=NYC&show_to_affiliates=true&token=35120b8381d8f9ecea3fbd296b0697c3";
-            HttpClient client = new HttpClient();
-            string response = await client.GetStringAsync(testPath);
-            var datas = JObject.Parse(response)["data"];
-
-            long currentId = 1;
-            
-            foreach (var data in datas)
-            {
-                Flight flight = CreateFlight(data, currentId);
-
-                _context.Flights.Add(flight);
-                currentId++;
-            }
-            await _context.SaveChangesAsync();
             return await _context.Flights.ToListAsync();
         }
 
