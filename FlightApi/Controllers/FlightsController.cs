@@ -57,6 +57,7 @@ namespace FlightApi.Controllers
             //                            null,
             //                            null);
             string path = urlBuilder("BUD", null, null, null, null,null,null);
+            //string testPath = "http://api.travelpayouts.com/v2/prices/nearest-places-matrix?currency=usd&origin=LED&destination=HKT&show_to_affiliates=true&depart_date=2020-11&return_date=2020-12&token=35120b8381d8f9ecea3fbd296b0697c3";
             string testPath = "http://api.travelpayouts.com/v2/prices/nearest-places-matrix?currency=usd&origin=LED&destination=HKT&show_to_affiliates=true&token=35120b8381d8f9ecea3fbd296b0697c3";
             HttpClient client = new HttpClient();
             string response = await client.GetStringAsync(testPath);
