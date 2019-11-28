@@ -46,8 +46,8 @@ namespace FlightApi.Controllers
             return flight;
         }
 
-        //methord for building the url
-        public string urlBuilder(string origin, string destination, string departDate, string returnDate, string currency, string tripClass, string sorting)
+        //method for building the url
+        public string UrlBuilder(string origin, string destination, string departDate, string returnDate, string currency, string tripClass, string sorting)
         {
             StringBuilder UrlSb = new StringBuilder();
             UrlSb.Append("http://api.travelpayouts.com/v2/prices/nearest-places-matrix?");
@@ -145,7 +145,7 @@ namespace FlightApi.Controllers
 
 
 
-            string path = urlBuilder(flight.Origin,
+            string path = UrlBuilder(flight.Origin,
                                         flight.Destination,
                                         flight.DepartDate,
                                         flight.ReturnDate,
