@@ -25,10 +25,11 @@ namespace FlightApi.Controllers
         }
 
 
-        private Flight CreateFlight(JToken data)
+        private Flight CreateFlight(JToken data, long currentId)
         {
             Flight flight = new Flight();
 
+            flight.FlightId = currentId;
             flight.ReturnDate = data["value"].ToString();
             flight.TripClass = data["trip_class"].ToString();
             flight.ShowToAffiliates = data["show_to_affiliates"].ToString();
@@ -80,11 +81,15 @@ namespace FlightApi.Controllers
             HttpClient client = new HttpClient();
             string response = await client.GetStringAsync(testPath);
             var datas = JObject.Parse(response)["data"];
+
+            long currentId = 1;
+            
             foreach (var data in datas)
             {
-                Flight flight = CreateFlight(data);
+                Flight flight = CreateFlight(data, currentId);
 
                 _context.Flights.Add(flight);
+                currentId++;
             }
             await _context.SaveChangesAsync();
             return await _context.Flights.ToListAsync();
@@ -153,11 +158,17 @@ namespace FlightApi.Controllers
 
             string response = await client.GetStringAsync(path);
             var datas = JObject.Parse(response)["data"]["prices"];
+
+            _context.Flights.RemoveRange(_context.Flights);
+
+            long currentId = 1;
+
             foreach (var data in datas)
             {
-                Flight flightToGiveBack = CreateFlight(data);
+                Flight flightToGiveBack = CreateFlight(data, currentId);
 
                 _context.Flights.Add(flightToGiveBack);
+                currentId++;
             }
             await _context.SaveChangesAsync();
             return await _context.Flights.ToListAsync();
