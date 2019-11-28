@@ -26,16 +26,19 @@ namespace FlightApi.Controllers
 
 
         //methord for building the url
-        public string urlBuilder(string origin, string destination, string currency, string tripClass, string sorting)
+        public string urlBuilder(string origin, string destination, string departDate, string returnDate, string currency, string tripClass, string sorting)
         {
             //string result = $"//api.travelpayouts.com/v1/prices/cheap?origin={origin}&destination={destination}&depart_date=2019-12&return_date=2019-12&sorting=price&token=35120b8381d8f9ecea3fbd296b0697c3";           
             StringBuilder UrlSb = new StringBuilder();
             UrlSb.Append("http://api.travelpayouts.com/v2/prices/nearest-places-matrix?");
-            UrlSb.Append($"currency={currency}&");
             UrlSb.Append($"origin={origin}&");
             UrlSb.Append($"destination={destination}&");
+            UrlSb.Append($"depart_date={departDate}&");
+            UrlSb.Append($"return_date={returnDate}&");
             UrlSb.Append($"trip_class={tripClass}&");
             UrlSb.Append($"sorting={sorting}&");
+            UrlSb.Append($"currency={currency}&");
+
             UrlSb.Append("token=35120b8381d8f9ecea3fbd296b0697c3");
             string result = UrlSb.ToString();
             return result;
@@ -45,8 +48,15 @@ namespace FlightApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Flight>>> GetFlights()
         {
-
-            string path = urlBuilder("BUD", null, null, null, null);
+            Dictionary<string, string> incomingJsonForFlight = new Dictionary<string, string>();
+            string path = urlBuilder(incomingJsonForFlight["direction"],
+                                        incomingJsonForFlight["toDirection"],
+                                        incomingJsonForFlight["depart_date"],
+                                        incomingJsonForFlight["return_date"],
+                                        null,
+                                        null,
+                                        null);
+            //string path = urlBuilder("BUD", null, null, null, null);
             HttpClient client = new HttpClient();
             string response = await client.GetStringAsync(path);
             var datas = JObject.Parse(response)["data"]["prices"];
