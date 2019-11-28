@@ -33,11 +33,11 @@ namespace FlightApi.Controllers
             UrlSb.Append("http://api.travelpayouts.com/v2/prices/nearest-places-matrix?");
             UrlSb.Append($"origin={origin}&");
             UrlSb.Append($"destination={destination}&");
-            UrlSb.Append($"depart_date={departDate}&");
-            UrlSb.Append($"return_date={returnDate}&");
-            UrlSb.Append($"trip_class={tripClass}&");
-            UrlSb.Append($"sorting={sorting}&");
-            UrlSb.Append($"currency={currency}&");
+            //UrlSb.Append($"depart_date={departDate}&");
+            //UrlSb.Append($"return_date={returnDate}&");
+            //UrlSb.Append($"trip_class={tripClass}&");
+            //UrlSb.Append($"sorting={sorting}&");
+            //UrlSb.Append($"currency={currency}&");
 
             UrlSb.Append("token=35120b8381d8f9ecea3fbd296b0697c3");
             string result = UrlSb.ToString();
@@ -141,47 +141,45 @@ namespace FlightApi.Controllers
         // POST: api/Flights
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPost]
-        public async Task<ActionResult<IEnumerable<Flight>>> PostFlights()
+        [HttpPost("filter")]
+        public async Task<ActionResult<IEnumerable<Flight>>> PostFlight(Flight flight)
         {
-            //Dictionary<string, string> incomingJsonForFlight = new Dictionary<string, string>();
-
-            //string path = urlBuilder(incomingJsonForFlight["direction"],
-            //                            incomingJsonForFlight["toDirection"],
-            //                            incomingJsonForFlight["departDate"],
-            //                            incomingJsonForFlight["returnDate"],
-            //                            null,
-            //                            null,
-            //                            null);
 
 
-            //string path = urlBuilder("BUD", null, null, null, null,null,null);
-            //string testPath = "http://api.travelpayouts.com/v2/prices/nearest-places-matrix?currency=usd&origin=LED&destination=HKT&show_to_affiliates=true&depart_date=2020-12&token=35120b8381d8f9ecea3fbd296b0697c3";
+
+            string path = urlBuilder(flight.Origin,
+                                        flight.Destination,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null);
             string testPath = "http://api.travelpayouts.com/v2/prices/nearest-places-matrix?currency=usd&origin=BUD&destination=NYC&show_to_affiliates=true&token=35120b8381d8f9ecea3fbd296b0697c3";
-            //string testPath = "http://api.travelpayouts.com/v1/prices/cheap?origin=NYC&destination=LAX&depart_date=2019-11&return_date=2019-12&token=35120b8381d8f9ecea3fbd296b0697c3";
+
             HttpClient client = new HttpClient();
-            string response = await client.GetStringAsync(testPath);
-            var datas = JObject.Parse(response)["data"];
-            string debugString = JObject.Parse(response)["data"].ToString();
+
+            string response = await client.GetStringAsync(path);
+            var datas = JObject.Parse(response)["data"]["prices"];
+            string debugString = datas.ToString();
             foreach (var data in datas)
             {
-                Flight flight = new Flight();
+                Flight flightToGiveBack = new Flight();
 
-                flight.ReturnDate = data["value"].ToString();
-                flight.TripClass = data["trip_class"].ToString();
-                flight.ShowToAffiliates = data["show_to_affiliates"].ToString();
-                flight.ReturnDate = data["return_date"].ToString();
-                flight.Origin = data["origin"].ToString();
-                flight.NumberOfChanges = data["number_of_changes"].ToString();
-                flight.Gate = data["gate"].ToString();
-                flight.FoundAt = data["found_at"].ToString();
-                flight.Distance = data["distance"].ToString();
-                flight.Duration = data["duration"].ToString();
-                flight.Destination = data["destination"].ToString();
-                flight.DepartDate = data["depart_date"].ToString();
-                flight.Actual = data["actual"].ToString();
+                flightToGiveBack.value = data["value"].ToString();
+                flightToGiveBack.TripClass = data["trip_class"].ToString();
+                flightToGiveBack.ShowToAffiliates = data["show_to_affiliates"].ToString();
+                flightToGiveBack.ReturnDate = data["return_date"].ToString();
+                flightToGiveBack.Origin = data["origin"].ToString();
+                flightToGiveBack.NumberOfChanges = data["number_of_changes"].ToString();
+                flightToGiveBack.Gate = data["gate"].ToString();
+                flightToGiveBack.FoundAt = data["found_at"].ToString();
+                flightToGiveBack.Distance = data["distance"].ToString();
+                flightToGiveBack.Duration = data["duration"].ToString();
+                flightToGiveBack.Destination = data["destination"].ToString();
+                flightToGiveBack.DepartDate = data["depart_date"].ToString();
+                flightToGiveBack.Actual = data["actual"].ToString();
 
-                _context.Flights.Add(flight);
+                _context.Flights.Add(flightToGiveBack);
             }
             await _context.SaveChangesAsync();
             return await _context.Flights.ToListAsync();
