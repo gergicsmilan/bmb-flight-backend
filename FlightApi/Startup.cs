@@ -45,7 +45,7 @@ namespace FlightApi
             app.UseRouting();
 
             app.UseCors(builder => {
-                builder.WithOrigins("http://localhost:3000/%22").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+                builder.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
             });
 
             app.UseEndpoints(endpoints =>

@@ -30,7 +30,7 @@ namespace FlightApi.Controllers
             Flight flight = new Flight();
 
             flight.FlightId = currentId;
-            flight.ReturnDate = data["value"].ToString();
+            flight.Value = data["value"].ToString();
             flight.TripClass = data["trip_class"].ToString();
             flight.ShowToAffiliates = data["show_to_affiliates"].ToString();
             flight.ReturnDate = data["return_date"].ToString();
@@ -55,12 +55,12 @@ namespace FlightApi.Controllers
             UrlSb.Append($"origin={origin}&");
             UrlSb.Append($"destination={destination}&");
 
-            if (departDate != null)
+            if (departDate != "")
             {
                 UrlSb.Append($"depart_date={departDate}&");
             }
 
-            if (returnDate != null)
+            if (returnDate != "")
             {
                 UrlSb.Append($"return_date={returnDate}&");
             }
