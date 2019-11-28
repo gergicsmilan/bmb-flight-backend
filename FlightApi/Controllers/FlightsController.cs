@@ -25,6 +25,27 @@ namespace FlightApi.Controllers
         }
 
 
+        private Flight CreateFlight(JToken data)
+        {
+            Flight flight = new Flight();
+
+            flight.ReturnDate = data["value"].ToString();
+            flight.TripClass = data["trip_class"].ToString();
+            flight.ShowToAffiliates = data["show_to_affiliates"].ToString();
+            flight.ReturnDate = data["return_date"].ToString();
+            flight.Origin = data["origin"].ToString();
+            flight.NumberOfChanges = data["number_of_changes"].ToString();
+            flight.Gate = data["gate"].ToString();
+            flight.FoundAt = data["found_at"].ToString();
+            flight.Distance = data["distance"].ToString();
+            flight.Duration = data["duration"].ToString();
+            flight.Destination = data["destination"].ToString();
+            flight.DepartDate = data["depart_date"].ToString();
+            flight.Actual = data["actual"].ToString();
+
+            return flight;
+        }
+
         //methord for building the url
         public string urlBuilder(string origin, string destination, string departDate, string returnDate, string currency, string tripClass, string sorting)
         {
@@ -61,21 +82,7 @@ namespace FlightApi.Controllers
             var datas = JObject.Parse(response)["data"];
             foreach (var data in datas)
             {
-                Flight flight = new Flight();
-
-                flight.ReturnDate = data["value"].ToString();
-                flight.TripClass = data["trip_class"].ToString();
-                flight.ShowToAffiliates = data["show_to_affiliates"].ToString();
-                flight.ReturnDate = data["return_date"].ToString();
-                flight.Origin = data["origin"].ToString();
-                flight.NumberOfChanges = data["number_of_changes"].ToString();
-                flight.Gate = data["gate"].ToString();
-                flight.FoundAt = data["found_at"].ToString();
-                flight.Distance = data["distance"].ToString();
-                flight.Duration= data["duration"].ToString();
-                flight.Destination = data["destination"].ToString();
-                flight.DepartDate = data["depart_date"].ToString();
-                flight.Actual = data["actual"].ToString();
+                Flight flight = CreateFlight(data);
 
                 _context.Flights.Add(flight);
             }
@@ -151,21 +158,7 @@ namespace FlightApi.Controllers
             var datas = JObject.Parse(response)["data"]["prices"];
             foreach (var data in datas)
             {
-                Flight flightToGiveBack = new Flight();
-
-                flightToGiveBack.Value = data["value"].ToString();
-                flightToGiveBack.TripClass = data["trip_class"].ToString();
-                flightToGiveBack.ShowToAffiliates = data["show_to_affiliates"].ToString();
-                flightToGiveBack.ReturnDate = data["return_date"].ToString();
-                flightToGiveBack.Origin = data["origin"].ToString();
-                flightToGiveBack.NumberOfChanges = data["number_of_changes"].ToString();
-                flightToGiveBack.Gate = data["gate"].ToString();
-                flightToGiveBack.FoundAt = data["found_at"].ToString();
-                flightToGiveBack.Distance = data["distance"].ToString();
-                flightToGiveBack.Duration = data["duration"].ToString();
-                flightToGiveBack.Destination = data["destination"].ToString();
-                flightToGiveBack.DepartDate = data["depart_date"].ToString();
-                flightToGiveBack.Actual = data["actual"].ToString();
+                Flight flightToGiveBack = CreateFlight(data);
 
                 _context.Flights.Add(flightToGiveBack);
             }
