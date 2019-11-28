@@ -28,7 +28,6 @@ namespace FlightApi.Controllers
         //methord for building the url
         public string urlBuilder(string origin, string destination, string departDate, string returnDate, string currency, string tripClass, string sorting)
         {
-            //string result = $"//api.travelpayouts.com/v1/prices/cheap?origin={origin}&destination={destination}&depart_date=2019-12&return_date=2019-12&sorting=price&token=35120b8381d8f9ecea3fbd296b0697c3";           
             StringBuilder UrlSb = new StringBuilder();
             UrlSb.Append("http://api.travelpayouts.com/v2/prices/nearest-places-matrix?");
             UrlSb.Append($"origin={origin}&");
@@ -56,25 +55,10 @@ namespace FlightApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Flight>>> GetFlights()
         {
-            //Dictionary<string, string> incomingJsonForFlight = new Dictionary<string, string>();
-            
-            //string path = urlBuilder(incomingJsonForFlight["direction"],
-            //                            incomingJsonForFlight["toDirection"],
-            //                            incomingJsonForFlight["departDate"],
-            //                            incomingJsonForFlight["returnDate"],
-            //                            null,
-            //                            null,
-            //                            null);
-
-
-            //string path = urlBuilder("BUD", null, null, null, null,null,null);
-            //string testPath = "http://api.travelpayouts.com/v2/prices/nearest-places-matrix?currency=usd&origin=LED&destination=HKT&show_to_affiliates=true&depart_date=2020-12&token=35120b8381d8f9ecea3fbd296b0697c3";
             string testPath = "http://api.travelpayouts.com/v2/prices/nearest-places-matrix?currency=usd&origin=BUD&destination=NYC&show_to_affiliates=true&token=35120b8381d8f9ecea3fbd296b0697c3";
-            //string testPath = "http://api.travelpayouts.com/v1/prices/cheap?origin=NYC&destination=LAX&depart_date=2019-11&return_date=2019-12&token=35120b8381d8f9ecea3fbd296b0697c3";
             HttpClient client = new HttpClient();
             string response = await client.GetStringAsync(testPath);
             var datas = JObject.Parse(response)["data"];
-            string debugString = JObject.Parse(response)["data"].ToString();
             foreach (var data in datas)
             {
                 Flight flight = new Flight();
@@ -97,7 +81,6 @@ namespace FlightApi.Controllers
             }
             await _context.SaveChangesAsync();
             return await _context.Flights.ToListAsync();
-            //return CreatedAtAction(nameof(GetFlight), new { id = flight.Id }, flight);
         }
 
         // GET: api/Flights/5
@@ -162,13 +145,10 @@ namespace FlightApi.Controllers
                                         null,
                                         null,
                                         null);
-            string testPath = "http://api.travelpayouts.com/v2/prices/nearest-places-matrix?currency=usd&origin=BUD&destination=NYC&show_to_affiliates=true&token=35120b8381d8f9ecea3fbd296b0697c3";
-
             HttpClient client = new HttpClient();
 
             string response = await client.GetStringAsync(path);
             var datas = JObject.Parse(response)["data"]["prices"];
-            string debugString = datas.ToString();
             foreach (var data in datas)
             {
                 Flight flightToGiveBack = new Flight();
@@ -191,19 +171,7 @@ namespace FlightApi.Controllers
             }
             await _context.SaveChangesAsync();
             return await _context.Flights.ToListAsync();
-            //return CreatedAtAction(nameof(GetFlight), new { id = flight.Id }, flight);
         }
-
-
-        //public async Task<ActionResult<Flight>> PostFlight(Flight flight)
-        //{
-
-
-
-
-        //}
-
-
 
         // DELETE: api/Flights/5
         [HttpDelete("{id}")]
