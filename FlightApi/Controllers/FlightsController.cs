@@ -48,25 +48,26 @@ namespace FlightApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Flight>>> GetFlights()
         {
-            Dictionary<string, string> incomingJsonForFlight = new Dictionary<string, string>();
-            string path = urlBuilder(incomingJsonForFlight["direction"],
-                                        incomingJsonForFlight["toDirection"],
-                                        incomingJsonForFlight["depart_date"],
-                                        incomingJsonForFlight["return_date"],
-                                        null,
-                                        null,
-                                        null);
-            //string path = urlBuilder("BUD", null, null, null, null);
+            //Dictionary<string, string> incomingJsonForFlight = new Dictionary<string, string>();
+            //string path = urlBuilder(incomingJsonForFlight["direction"],
+            //                            incomingJsonForFlight["toDirection"],
+            //                            incomingJsonForFlight["departDate"],
+            //                            incomingJsonForFlight["returnDate"],
+            //                            null,
+            //                            null,
+            //                            null);
+            string path = urlBuilder("BUD", null, null, null, null,null,null);
+            string testPath = "http://api.travelpayouts.com/v2/prices/nearest-places-matrix?currency=usd&origin=LED&destination=HKT&show_to_affiliates=true&token=35120b8381d8f9ecea3fbd296b0697c3";
             HttpClient client = new HttpClient();
-            string response = await client.GetStringAsync(path);
-            var datas = JObject.Parse(response)["data"]["prices"];
-            string debugString = JObject.Parse(response)["data"]["prices"].ToString();
+            string response = await client.GetStringAsync(testPath);
+            var datas = JObject.Parse(response)["data"];
+            string debugString = JObject.Parse(response)["data"].ToString();
             foreach (var data in datas)
             {
                 Flight flight = new Flight();
 
-                flight.Destination = data["destination"].ToString();
                 flight.Origin = data["origin"].ToString();
+                flight.Destination = data["destination"].ToString();
                 flight.DepartDate = data["depart_date"].ToString();
                 flight.ReturnDate = data["return_date"].ToString();
                 flight.NumberOfChanges = data["number_of_changes"].ToString();
