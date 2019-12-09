@@ -7,19 +7,13 @@ namespace FlightApi
 {
     public class Registration
     {
-        public void CreateUser(string userName, string password, string firstName, string lastName)
+        public static void CreateUser(User registeringUser)
         {
             using (var db = new UserContext())
             {                
-                db.Add(new User
-                {
-                    UserName = userName,
-                    Password = password,
-                    FirstName = firstName,
-                    LastName = lastName
-                });
-                db.SaveChanges();  
+                db.Add(registeringUser); 
             }
+
         }
     }
 }
