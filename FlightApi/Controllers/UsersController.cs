@@ -27,12 +27,20 @@ namespace FlightApi.Controllers
 
         private readonly UserContext _context;
 
+
         public string Secret { get; set; } = "AAAAAAAAAAAAAAAAAAAAAAAAAA==";
         public string SecurityAlgorithm { get; set; } = SecurityAlgorithms.HmacSha256Signature;
         public UsersController(UserContext context)
         {
             _context = context;
         }
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        {
+            return await _context.Users.ToListAsync();
+        }
+
+
 
         [HttpPost("registration")]
         public async Task<ActionResult<string>> PostUser(User registeringUser)
@@ -40,10 +48,13 @@ namespace FlightApi.Controllers
             var tokenString = string.Empty;
             if (!_context.Users.Any(user => user.UserName.Equals(registeringUser.UserName)))
             {
-                Registration.CreateUser(registeringUser);
-                JwtHeader header = new JwtHeader();
-                header.Add("alg", "HS256");
-                header.Add("typ", "JWT");
+                _context.Add(registeringUser);
+
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+                JwtHeader header = new JwtHeader(credentials);
+                //header["alg"] = "HS256";
+                //header["typ"] = "JWT";
 
                 JwtPayload payload = new JwtPayload();
                 payload.Add("firstName", registeringUser.FirstName);
@@ -56,6 +67,7 @@ namespace FlightApi.Controllers
 
                 registeringUser.TokenString = tokenString;
 
+ 
                 await _context.SaveChangesAsync();
 
             }

@@ -29,6 +29,8 @@ namespace FlightApi
         {
             services.AddDbContext<FlightContext>(opt =>
                opt.UseInMemoryDatabase("FlightList"));
+            services.AddDbContext<UserContext>(opt =>
+               opt.UseInMemoryDatabase("UserList"));
             services.AddControllers();
         }
 
