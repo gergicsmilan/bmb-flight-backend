@@ -48,6 +48,8 @@ namespace FlightApi.Controllers
             var tokenString = string.Empty;
             if (!_context.Users.Any(user => user.UserName.Equals(registeringUser.UserName)))
             {
+                string hashedPassword = HashUserPassword(registeringUser.Password);
+                registeringUser.Password = hashedPassword;
                 _context.Add(registeringUser);
 
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret));
@@ -76,9 +78,13 @@ namespace FlightApi.Controllers
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
             }
 
-
-
             return tokenString;
+        }
+
+        private string HashUserPassword(string password)
+        {
+            string hashedPassword = PasswordHasher.CreateSaltedPasswordHash(password);
+            return hashedPassword;
         }
 
         public static byte[] GetHash(string inputString)
