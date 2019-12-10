@@ -35,25 +35,27 @@ namespace FlightApi.Controllers
         }
 
         [HttpPost("registration")]
-        public async Task<ActionResult<IEnumerable<User>>> PostUser(User registeringUser)
+        public async Task<ActionResult<string>> PostUser(User registeringUser)
         {
+            var tokenString = string.Empty;
             if (!_context.Users.Any(user => user.UserName.Equals(registeringUser.UserName)))
             {
-
-
                 Registration.CreateUser(registeringUser);
                 JwtHeader header = new JwtHeader();
                 header.Add("alg", "HS256");
                 header.Add("typ", "JWT");
-
 
                 JwtPayload payload = new JwtPayload();
                 payload.Add("firstName", registeringUser.FirstName);
                 payload.Add("lastName", registeringUser.LastName);
                 payload.Add("userName", registeringUser.UserName);
 
-                byte[] headerBytes = Encoding.ASCII.GetBytes(header);
-                var hash = new HMACSHA256();
+                var secToken = new JwtSecurityToken(header, payload);
+                var handler = new JwtSecurityTokenHandler();
+                tokenString = handler.WriteToken(secToken);
+
+                registeringUser.TokenString = tokenString;
+
                 await _context.SaveChangesAsync();
 
             }
@@ -62,15 +64,18 @@ namespace FlightApi.Controllers
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
             }
 
-            return await _context.Users.ToListAsync();
-
-            public static byte[] GetHash(string inputString)
-            {
-                HashAlgorithm algorithm = SHA256.Create();
-                return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
-            }
 
 
+            return tokenString;
         }
+
+        public static byte[] GetHash(string inputString)
+        {
+            HashAlgorithm algorithm = SHA256.Create();
+            return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
+        }
+
+
+        
     }
 }

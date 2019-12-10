@@ -10,10 +10,10 @@ namespace FlightApi
         public static void CreateUser(User registeringUser)
         {
             using (var db = new UserContext())
-            {                
+            {   
+                
                 db.Add(registeringUser); 
             }
-
         }
     }
 }

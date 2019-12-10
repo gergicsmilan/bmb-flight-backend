@@ -22,6 +22,8 @@ namespace FlightApi
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
+        public string TokenString { get; set; }
+
         public List<Ticket> Tickets { get; } = new List<Ticket>();
     }
 
