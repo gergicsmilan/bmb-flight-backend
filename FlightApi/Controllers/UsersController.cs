@@ -101,9 +101,9 @@ namespace FlightApi.Controllers
                 //header["typ"] = "JWT";
 
                 JwtPayload payload = new JwtPayload();
-                payload.Add("firstName", loggingInUser.FirstName);
-                payload.Add("lastName", loggingInUser.LastName);
-                payload.Add("userName", loggingInUser.UserName);
+                payload.Add("firstName", foundUser.FirstName);
+                payload.Add("lastName", foundUser.LastName);
+                payload.Add("userName", foundUser.UserName);
 
                 var secToken = new JwtSecurityToken(header, payload);
                 var handler = new JwtSecurityTokenHandler();
