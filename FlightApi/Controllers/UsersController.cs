@@ -92,7 +92,7 @@ namespace FlightApi.Controllers
             string tokenString = string.Empty;
 
 
-            if (hashedIncomingPassword.Equals(foundUser.Password))
+            if (foundUser != null && hashedIncomingPassword.Equals(foundUser.Password))
             {
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
