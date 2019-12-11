@@ -55,8 +55,6 @@ namespace FlightApi.Controllers
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
                 JwtHeader header = new JwtHeader(credentials);
-                //header["alg"] = "HS256";
-                //header["typ"] = "JWT";
 
                 JwtPayload payload = new JwtPayload();
                 payload.Add("firstName", registeringUser.FirstName);
@@ -83,8 +81,6 @@ namespace FlightApi.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<string>> PostLogin(User loggingInUser)
         {
-            // User foundUser = await _context.Users.FindAsync(loggingInUser.UserName);
-
             string hashedIncomingPassword = HashUserPassword(loggingInUser.Password);
 
             User foundUser = _context.Users.Where(user => user.UserName.Equals(loggingInUser.UserName)).FirstOrDefault();
@@ -97,8 +93,6 @@ namespace FlightApi.Controllers
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
                 JwtHeader header = new JwtHeader(credentials);
-                //header["alg"] = "HS256";
-                //header["typ"] = "JWT";
 
                 JwtPayload payload = new JwtPayload();
                 payload.Add("firstName", foundUser.FirstName);
