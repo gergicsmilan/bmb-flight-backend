@@ -52,18 +52,7 @@ namespace FlightApi.Controllers
                 registeringUser.Password = hashedPassword;
                 _context.Add(registeringUser);
 
-                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret));
-                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-                JwtHeader header = new JwtHeader(credentials);
-
-                JwtPayload payload = new JwtPayload();
-                payload.Add("firstName", registeringUser.FirstName);
-                payload.Add("lastName", registeringUser.LastName);
-                payload.Add("userName", registeringUser.UserName);
-
-                var secToken = new JwtSecurityToken(header, payload);
-                var handler = new JwtSecurityTokenHandler();
-                tokenString = handler.WriteToken(secToken);
+                tokenString = CreateJWTToken(registeringUser, Secret);
 
                 registeringUser.TokenString = tokenString;
 
@@ -90,18 +79,7 @@ namespace FlightApi.Controllers
 
             if (foundUser != null && hashedIncomingPassword.Equals(foundUser.Password))
             {
-                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret));
-                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-                JwtHeader header = new JwtHeader(credentials);
-
-                JwtPayload payload = new JwtPayload();
-                payload.Add("firstName", foundUser.FirstName);
-                payload.Add("lastName", foundUser.LastName);
-                payload.Add("userName", foundUser.UserName);
-
-                var secToken = new JwtSecurityToken(header, payload);
-                var handler = new JwtSecurityTokenHandler();
-                tokenString = handler.WriteToken(secToken);
+                tokenString = CreateJWTToken(foundUser, Secret);
 
                 loggingInUser.TokenString = tokenString;
 
@@ -127,7 +105,22 @@ namespace FlightApi.Controllers
             return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
         }
 
+        private static string CreateJWTToken(User user, string secretKey)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+            JwtHeader header = new JwtHeader(credentials);
 
-        
+            JwtPayload payload = new JwtPayload();
+            payload.Add("firstName", user.FirstName);
+            payload.Add("lastName", user.LastName);
+            payload.Add("userName", user.UserName);
+
+            var secToken = new JwtSecurityToken(header, payload);
+            var handler = new JwtSecurityTokenHandler();
+            var tokenString = handler.WriteToken(secToken);
+
+            return tokenString;
+        }
     }
 }
