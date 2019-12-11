@@ -26,8 +26,6 @@ namespace FlightApi.Controllers
     {
 
         private readonly UserContext _context;
-
-
         public string Secret { get; set; } = "AAAAAAAAAAAAAAAAAAAAAAAAAA==";
         public string SecurityAlgorithm { get; set; } = SecurityAlgorithms.HmacSha256Signature;
         public UsersController(UserContext context)
@@ -46,6 +44,7 @@ namespace FlightApi.Controllers
         public async Task<ActionResult<string>> PostUser(User registeringUser)
         {
             var tokenString = string.Empty;
+
             if (!_context.Users.Any(user => user.UserName.Equals(registeringUser.UserName)))
             {
                 string hashedPassword = HashUserPassword(registeringUser.Password);
@@ -55,10 +54,8 @@ namespace FlightApi.Controllers
                 tokenString = CreateJWTToken(registeringUser, Secret);
 
                 registeringUser.TokenString = tokenString;
-
  
                 await _context.SaveChangesAsync();
-
             }
             else
             {
@@ -73,9 +70,8 @@ namespace FlightApi.Controllers
             string hashedIncomingPassword = HashUserPassword(loggingInUser.Password);
 
             User foundUser = _context.Users.Where(user => user.UserName.Equals(loggingInUser.UserName)).FirstOrDefault();
-            
-            string tokenString = string.Empty;
 
+            string tokenString = string.Empty;
 
             if (foundUser != null && hashedIncomingPassword.Equals(foundUser.Password))
             {

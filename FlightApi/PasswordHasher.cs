@@ -14,7 +14,6 @@ namespace FlightApi
         public static string CreateSaltedPasswordHash(string password)
         {
             string savedPasswordHash = BCrypt.Net.BCrypt.HashPassword(password, Salt);
-
             return savedPasswordHash;
         }
     }
