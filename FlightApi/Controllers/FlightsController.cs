@@ -30,7 +30,7 @@ namespace FlightApi.Controllers
             Flight flight = new Flight();
 
             flight.FlightId = currentId;
-            flight.ReturnDate = data["value"].ToString();
+            flight.Value = data["value"].ToString();
             flight.TripClass = data["trip_class"].ToString();
             flight.ShowToAffiliates = data["show_to_affiliates"].ToString();
             flight.ReturnDate = data["return_date"].ToString();
