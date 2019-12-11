@@ -80,6 +80,46 @@ namespace FlightApi.Controllers
 
             return tokenString;
         }
+        [HttpPost("login")]
+        public async Task<ActionResult<string>> PostLogin(User loggingInUser)
+        {
+            // User foundUser = await _context.Users.FindAsync(loggingInUser.UserName);
+
+            string hashedIncomingPassword = HashUserPassword(loggingInUser.Password);
+
+            User foundUser = _context.Users.Where(user => user.UserName.Equals(loggingInUser.UserName)).FirstOrDefault();
+            
+            string tokenString = string.Empty;
+
+
+            if (hashedIncomingPassword.Equals(foundUser.Password))
+            {
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+                JwtHeader header = new JwtHeader(credentials);
+                //header["alg"] = "HS256";
+                //header["typ"] = "JWT";
+
+                JwtPayload payload = new JwtPayload();
+                payload.Add("firstName", loggingInUser.FirstName);
+                payload.Add("lastName", loggingInUser.LastName);
+                payload.Add("userName", loggingInUser.UserName);
+
+                var secToken = new JwtSecurityToken(header, payload);
+                var handler = new JwtSecurityTokenHandler();
+                tokenString = handler.WriteToken(secToken);
+
+                loggingInUser.TokenString = tokenString;
+
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            }
+
+            return tokenString;
+        }
 
         private string HashUserPassword(string password)
         {
