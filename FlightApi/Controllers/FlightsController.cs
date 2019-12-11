@@ -55,12 +55,12 @@ namespace FlightApi.Controllers
             UrlSb.Append($"origin={origin}&");
             UrlSb.Append($"destination={destination}&");
 
-            if (departDate != null)
+            if (departDate != null && departDate != string.Empty)
             {
                 UrlSb.Append($"depart_date={departDate}&");
             }
 
-            if (returnDate != null)
+            if (returnDate != null && returnDate != string.Empty)
             {
                 UrlSb.Append($"return_date={returnDate}&");
             }
