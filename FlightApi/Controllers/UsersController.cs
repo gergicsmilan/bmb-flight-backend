@@ -27,6 +27,7 @@ namespace FlightApi.Controllers
         private readonly UserContext _context;
         public string Secret { get; set; } = "AAAAAAAAAAAAAAAAAAAAAAAAAA==";
         public string SecurityAlgorithm { get; set; } = SecurityAlgorithms.HmacSha256Signature;
+
         public UsersController(UserContext context)
         {
             _context = context;
