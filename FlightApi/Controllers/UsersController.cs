@@ -65,7 +65,9 @@ namespace FlightApi.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<string>> PostLogin(User loggingInUser)
         {
-            User foundUser = _context.Users.Where(user => user.UserName.Equals(loggingInUser.UserName)).FirstOrDefault();
+            User foundUser = _context.Users
+                .Where(user => user.UserName.Equals(loggingInUser.UserName))
+                .FirstOrDefault();
             string hashedIncomingPassword = HashUserPassword(loggingInUser.Password);
 
             string tokenString = string.Empty;
