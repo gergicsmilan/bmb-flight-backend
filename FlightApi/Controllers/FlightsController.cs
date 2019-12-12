@@ -141,13 +141,13 @@ namespace FlightApi.Controllers
             HttpClient client = new HttpClient();
 
             string response = await client.GetStringAsync(path);
-            var datas = JObject.Parse(response)["data"]["prices"];
+            JToken datas = JObject.Parse(response)["data"]["prices"];
 
             _context.Flights.RemoveRange(_context.Flights);
 
             long currentId = 1;
 
-            foreach (var data in datas)
+            foreach (JToken data in datas)
             {
                 Flight flightToGiveBack = CreateFlight(data, currentId);
 

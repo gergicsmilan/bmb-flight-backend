@@ -41,7 +41,7 @@ namespace FlightApi.Controllers
         [HttpPost("registration")]
         public async Task<ActionResult<string>> PostUser(User registeringUser)
         {
-            var tokenString = string.Empty;
+            string tokenString = string.Empty;
 
             if (!_context.Users.Any(user => user.UserName.Equals(registeringUser.UserName)))
             {
@@ -61,6 +61,7 @@ namespace FlightApi.Controllers
 
             return tokenString;
         }
+
         [HttpPost("login")]
         public async Task<ActionResult<string>> PostLogin(User loggingInUser)
         {
@@ -100,16 +101,16 @@ namespace FlightApi.Controllers
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-            JwtHeader header = new JwtHeader(credentials);
+            var header = new JwtHeader(credentials);
 
-            JwtPayload payload = new JwtPayload();
+            var payload = new JwtPayload();
             payload.Add("firstName", user.FirstName);
             payload.Add("lastName", user.LastName);
             payload.Add("userName", user.UserName);
 
             var secToken = new JwtSecurityToken(header, payload);
             var handler = new JwtSecurityTokenHandler();
-            var tokenString = handler.WriteToken(secToken);
+            string tokenString = handler.WriteToken(secToken);
 
             return tokenString;
         }
