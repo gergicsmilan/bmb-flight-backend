@@ -24,74 +24,10 @@ namespace FlightApi.Controllers
             _context = context;
         }
 
-
-        private Flight CreateFlight(JToken data, long currentId)
-        {
-            Flight flight = new Flight();
-
-            flight.FlightId = currentId;
-            flight.Value = data["value"].ToString();
-            flight.TripClass = data["trip_class"].ToString();
-            flight.ShowToAffiliates = data["show_to_affiliates"].ToString();
-            flight.ReturnDate = data["return_date"].ToString();
-            flight.Origin = data["origin"].ToString();
-            flight.NumberOfChanges = data["number_of_changes"].ToString();
-            flight.Gate = data["gate"].ToString();
-            flight.FoundAt = data["found_at"].ToString();
-            flight.Distance = data["distance"].ToString();
-            flight.Duration = data["duration"].ToString();
-            flight.Destination = data["destination"].ToString();
-            flight.DepartDate = data["depart_date"].ToString();
-            flight.Actual = data["actual"].ToString();
-
-            return flight;
-        }
-
-        //method for building the url
-        private string UrlBuilder(string origin, string destination, string departDate, string returnDate, string currency, string tripClass, string sorting)
-        {
-            StringBuilder UrlSb = new StringBuilder();
-            UrlSb.Append("http://api.travelpayouts.com/v2/prices/nearest-places-matrix?");
-            UrlSb.Append($"origin={origin}&");
-            UrlSb.Append($"destination={destination}&");
-
-            if (departDate != "")
-            {
-                UrlSb.Append($"depart_date={departDate}&");
-            }
-
-            if (returnDate != "")
-            {
-                UrlSb.Append($"return_date={returnDate}&");
-            }
-            //UrlSb.Append($"trip_class={tripClass}&");
-            //UrlSb.Append($"sorting={sorting}&");
-            //UrlSb.Append($"currency={currency}&");
-
-            UrlSb.Append("token=35120b8381d8f9ecea3fbd296b0697c3");
-            string result = UrlSb.ToString();
-            return result;
-        }
-
         // GET: api/Flights
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Flight>>> GetFlights()
         {
-            string testPath = "http://api.travelpayouts.com/v2/prices/nearest-places-matrix?currency=usd&origin=BUD&destination=NYC&show_to_affiliates=true&token=35120b8381d8f9ecea3fbd296b0697c3";
-            HttpClient client = new HttpClient();
-            string response = await client.GetStringAsync(testPath);
-            var datas = JObject.Parse(response)["data"];
-
-            long currentId = 1;
-            
-            foreach (var data in datas)
-            {
-                Flight flight = CreateFlight(data, currentId);
-
-                _context.Flights.Add(flight);
-                currentId++;
-            }
-            await _context.SaveChangesAsync();
             return await _context.Flights.ToListAsync();
         }
 
@@ -157,20 +93,22 @@ namespace FlightApi.Controllers
             HttpClient client = new HttpClient();
 
             string response = await client.GetStringAsync(path);
-            var datas = JObject.Parse(response)["data"]["prices"];
+            JToken datas = JObject.Parse(response)["data"]["prices"];
 
             _context.Flights.RemoveRange(_context.Flights);
 
             long currentId = 1;
 
-            foreach (var data in datas)
+            foreach (JToken data in datas)
             {
                 Flight flightToGiveBack = CreateFlight(data, currentId);
 
                 _context.Flights.Add(flightToGiveBack);
                 currentId++;
             }
+
             await _context.SaveChangesAsync();
+
             return await _context.Flights.ToListAsync();
         }
 
@@ -188,6 +126,54 @@ namespace FlightApi.Controllers
             await _context.SaveChangesAsync();
 
             return flight;
+        }
+
+        private Flight CreateFlight(JToken data, long currentId)
+        {
+            Flight flight = new Flight();
+
+            flight.FlightId = currentId;
+            flight.Value = data["value"].ToString();
+            flight.TripClass = data["trip_class"].ToString();
+            flight.ShowToAffiliates = data["show_to_affiliates"].ToString();
+            flight.ReturnDate = data["return_date"].ToString();
+            flight.Origin = data["origin"].ToString();
+            flight.NumberOfChanges = data["number_of_changes"].ToString();
+            flight.Gate = data["gate"].ToString();
+            flight.FoundAt = data["found_at"].ToString();
+            flight.Distance = data["distance"].ToString();
+            flight.Duration = data["duration"].ToString();
+            flight.Destination = data["destination"].ToString();
+            flight.DepartDate = data["depart_date"].ToString();
+            flight.Actual = data["actual"].ToString();
+
+            return flight;
+        }
+
+        //method for building the url
+        private string UrlBuilder(string origin, string destination, string departDate, string returnDate, string currency, string tripClass, string sorting)
+        {
+            StringBuilder UrlSb = new StringBuilder();
+            UrlSb.Append("http://api.travelpayouts.com/v2/prices/nearest-places-matrix?");
+            UrlSb.Append($"origin={origin}&");
+            UrlSb.Append($"destination={destination}&");
+
+            if (departDate != null && departDate != string.Empty)
+            {
+                UrlSb.Append($"depart_date={departDate}&");
+            }
+
+            if (returnDate != null && returnDate != string.Empty)
+            {
+                UrlSb.Append($"return_date={returnDate}&");
+            }
+            //UrlSb.Append($"trip_class={tripClass}&");
+            //UrlSb.Append($"sorting={sorting}&");
+            //UrlSb.Append($"currency={currency}&");
+
+            UrlSb.Append("token=35120b8381d8f9ecea3fbd296b0697c3");
+            string result = UrlSb.ToString();
+            return result;
         }
 
         private bool FlightExists(long id)
