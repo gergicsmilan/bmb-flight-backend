@@ -88,16 +88,16 @@ namespace FlightApi.Controllers
             return tokenString;
         }
 
-        private string HashUserPassword(string password)
-        {
-            string hashedPassword = PasswordHasher.CreateSaltedPasswordHash(password);
-            return hashedPassword;
-        }
-
         public static byte[] GetHash(string inputString)
         {
             HashAlgorithm algorithm = SHA256.Create();
             return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
+        }
+
+        private string HashUserPassword(string password)
+        {
+            string hashedPassword = PasswordHasher.CreateSaltedPasswordHash(password);
+            return hashedPassword;
         }
 
         private static string CreateJWTToken(User user, string secretKey)
