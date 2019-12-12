@@ -24,7 +24,6 @@ namespace FlightApi.Controllers
             _context = context;
         }
 
-
         private Flight CreateFlight(JToken data, long currentId)
         {
             Flight flight = new Flight();
@@ -155,7 +154,9 @@ namespace FlightApi.Controllers
                 _context.Flights.Add(flightToGiveBack);
                 currentId++;
             }
+
             await _context.SaveChangesAsync();
+
             return await _context.Flights.ToListAsync();
         }
 

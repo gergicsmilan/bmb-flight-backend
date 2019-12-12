@@ -24,7 +24,6 @@ namespace FlightApi.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-
         private readonly UserContext _context;
         public string Secret { get; set; } = "AAAAAAAAAAAAAAAAAAAAAAAAAA==";
         public string SecurityAlgorithm { get; set; } = SecurityAlgorithms.HmacSha256Signature;
@@ -32,13 +31,12 @@ namespace FlightApi.Controllers
         {
             _context = context;
         }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
-
-
 
         [HttpPost("registration")]
         public async Task<ActionResult<string>> PostUser(User registeringUser)
@@ -52,9 +50,8 @@ namespace FlightApi.Controllers
                 _context.Add(registeringUser);
 
                 tokenString = CreateJWTToken(registeringUser, Secret);
-
                 registeringUser.TokenString = tokenString;
- 
+
                 await _context.SaveChangesAsync();
             }
             else
@@ -67,16 +64,14 @@ namespace FlightApi.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<string>> PostLogin(User loggingInUser)
         {
-            string hashedIncomingPassword = HashUserPassword(loggingInUser.Password);
-
             User foundUser = _context.Users.Where(user => user.UserName.Equals(loggingInUser.UserName)).FirstOrDefault();
+            string hashedIncomingPassword = HashUserPassword(loggingInUser.Password);
 
             string tokenString = string.Empty;
 
             if (foundUser != null && hashedIncomingPassword.Equals(foundUser.Password))
             {
                 tokenString = CreateJWTToken(foundUser, Secret);
-
                 loggingInUser.TokenString = tokenString;
 
                 await _context.SaveChangesAsync();
