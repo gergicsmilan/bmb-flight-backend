@@ -92,7 +92,17 @@ namespace FlightApi.Controllers
                                         null);
             HttpClient client = new HttpClient();
 
-            string response = await client.GetStringAsync(path);
+            string response;
+
+            try
+            {
+                response = await client.GetStringAsync(path);
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+
             JToken datas = JObject.Parse(response)["data"]["prices"];
 
             _context.Flights.RemoveRange(_context.Flights);
