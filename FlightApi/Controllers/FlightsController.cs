@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FlightApi.Models;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -26,9 +27,43 @@ namespace FlightApi.Controllers
 
         // GET: api/Flights
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Flight>>> GetFlights()
+        public async Task<ActionResult<Dictionary<string, string>>> GetPopularFlights()
         {
-            return await _context.Flights.ToListAsync();
+            Dictionary<string, string> topFlights = new Dictionary<string, string>();
+
+            HttpClient httpClient = new HttpClient();
+            string response =
+                await httpClient.GetStringAsync(
+                    "http://api.travelpayouts.com/v1/city-directions?origin=BUD&currency=huf&token=3e08147c7f7449e03258a7b4daa9bdbf");
+            httpClient.DefaultRequestHeaders.Add("x-rapidapi-key", "033ea2f472msh7c7d1b40c8172acp1c5f99jsn3001eb77120e");
+
+            JObject jsonResponse = JObject.Parse(response);
+            JToken data = jsonResponse["data"];
+
+            var counter = 0;
+            foreach (var flight in jsonResponse["data"])
+            {
+                if (counter < 6)
+                {
+                    var destination = flight.First["destination"];
+
+                    var resp = await httpClient.GetStringAsync("https://airport-info.p.rapidapi.com/airport?iata=" + destination);
+                    JObject jsonResp = JObject.Parse(resp);
+
+                    var fullCityName = jsonResp["location"].ToString();
+                    var city = fullCityName.Substring(0, fullCityName.IndexOf(','));
+                    var price = flight.First["price"].ToString();
+
+                    topFlights.Add(city, price);
+                    counter++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return topFlights;
         }
 
         // GET: api/Flights/5
