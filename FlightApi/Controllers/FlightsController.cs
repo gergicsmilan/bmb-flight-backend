@@ -40,10 +40,13 @@ namespace FlightApi.Controllers
             JObject jsonResponse = JObject.Parse(response);
             JToken data = jsonResponse["data"];
 
-            var counter = 0;
+            int maxAmountOfCities = 6;
+            int amountOfCities = data.Children().Count();
+
+            var counter = amountOfCities >= maxAmountOfCities ? 0 : maxAmountOfCities - amountOfCities;
             foreach (var flight in jsonResponse["data"])
             {
-                if (counter < 6)
+                if (counter < maxAmountOfCities)
                 {
                     var destination = flight.First["destination"];
 
