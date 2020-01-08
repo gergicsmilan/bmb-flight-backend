@@ -28,10 +28,14 @@ namespace FlightApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<FlightContext>(opt =>
-               opt.UseInMemoryDatabase("FlightList"));
+            //services.AddDbContext<FlightContext>(opt =>
+            //   opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            //services.AddDbContext<UserContext>(opt =>
+            //   opt.UseInMemoryDatabase("UserList"));
             services.AddDbContext<UserContext>(opt =>
-               opt.UseInMemoryDatabase("UserList"));
+               opt.UseSqlite("UserList"));
+            services.AddDbContext<FlightContext>(opt =>
+               opt.UseSqlite("FlightList"));
             services.AddControllers();
         }
 
