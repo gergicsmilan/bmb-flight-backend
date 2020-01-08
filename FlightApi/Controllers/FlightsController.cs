@@ -137,7 +137,7 @@ namespace FlightApi.Controllers
             {
                 response = await client.GetStringAsync(path);
             }
-            catch (Exception e)
+            catch (HttpRequestException e)
             {
                 return null;
             }
