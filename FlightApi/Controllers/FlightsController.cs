@@ -34,13 +34,21 @@ namespace FlightApi.Controllers
             string response =
                 await httpClient.GetStringAsync(
                     "http://api.travelpayouts.com/v1/city-directions?origin=BUD&currency=huf&token=3e08147c7f7449e03258a7b4daa9bdbf");
+            
+            var flights = new List<Flight>();
 
             JObject jsonResponse = JObject.Parse(response);
-            JToken data = jsonResponse["data"];
+            foreach (JToken jToken in jsonResponse["data"].Children())
+            {
+                Flight flight = jToken.First.ToObject<Flight>();
 
-            int amountOfCities = data.Children().Count();
+                flights.Add(flight);
+            }
 
-            Dictionary<string, string> citiesWithPrices = await GetCitiesWithPrices(amountOfCities, data);
+
+            int amountOfCities = flights.Count();
+
+            Dictionary<string, string> citiesWithPrices = await GetCitiesWithPrices(amountOfCities, flights);
 
             return citiesWithPrices;
         }
@@ -155,7 +163,7 @@ namespace FlightApi.Controllers
             Flight flight = new Flight();
 
             flight.FlightId = currentId;
-            flight.Value = data["value"].ToString();
+            flight.Price = data["value"].ToString();
             flight.TripClass = data["trip_class"].ToString();
             flight.ShowToAffiliates = data["show_to_affiliates"].ToString();
             flight.ReturnDate = data["return_date"].ToString();
@@ -198,7 +206,7 @@ namespace FlightApi.Controllers
             return result;
         }
 
-        private async Task<Dictionary<string, string>> GetCitiesWithPrices(int amountOfCities, JToken flights)
+        private async Task<Dictionary<string, string>> GetCitiesWithPrices(int amountOfCities, List<Flight> flights)
         {
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("x-rapidapi-key", "033ea2f472msh7c7d1b40c8172acp1c5f99jsn3001eb77120e");
@@ -208,34 +216,42 @@ namespace FlightApi.Controllers
             int maxAmountOfCities = 6;
 
             var counter = amountOfCities >= maxAmountOfCities ? 0 : maxAmountOfCities - amountOfCities;
-            foreach (var flight in flights)
-            {
-                if (counter < maxAmountOfCities)
-                {
-                    (string city, string price) = await CreateCityWithPrice(httpClient, flight);
 
-                    citiesWithPrices.Add(city, price);
-                    counter++;
-                }
-                else
-                {
-                    break;
-                }
+            for (int i = counter; i < maxAmountOfCities; i++)
+            {
+                (string city, string price) = await CreateCityWithPrice(httpClient, flights[i]);
+
+                citiesWithPrices.Add(city, price);
             }
+
+            //foreach (var flight in flights)
+            //{
+            //    if (amountOfCitiesToShow < maxAmountOfCities)
+            //    {
+            //        (string city, string price) = await CreateCityWithPrice(httpClient, flight);
+
+            //        citiesWithPrices.Add(city, price);
+            //        amountOfCitiesToShow++;
+            //    }
+            //    else
+            //    {
+            //        break;
+            //    }
+            //}
 
             return citiesWithPrices;
         }
 
-        private async Task<(string, string)> CreateCityWithPrice(HttpClient httpClient, JToken flight)
+        private async Task<(string, string)> CreateCityWithPrice(HttpClient httpClient, Flight flight)
         {
-            var destination = flight.First["destination"];
+            var destination = flight.Destination;
 
             var resp = await httpClient.GetStringAsync("https://airport-info.p.rapidapi.com/airport?iata=" + destination);
             JObject jsonResp = JObject.Parse(resp);
 
             var fullCityName = jsonResp["location"].ToString();
             var city = fullCityName.Substring(0, fullCityName.IndexOf(','));
-            var price = flight.First["price"].ToString();
+            var price = flight.Price;
 
             return (city, price);
         }
