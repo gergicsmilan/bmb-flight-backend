@@ -12,6 +12,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using FlightApi.Util;
 
 namespace FlightApi.Controllers
 {
@@ -30,12 +31,9 @@ namespace FlightApi.Controllers
         [HttpGet]
         public async Task<ActionResult<Dictionary<string, string>>> GetPopularFlights()
         {
-            HttpClient httpClient = new HttpClient();
-            string response =
-                await httpClient.GetStringAsync(
-                    "http://api.travelpayouts.com/v1/city-directions?origin=BUD&currency=huf&token=3e08147c7f7449e03258a7b4daa9bdbf");
+            string response = await HttpService.HandleHttpGetRequest("http://api.travelpayouts.com/v1/city-directions?origin=BUD&currency=huf&token=3e08147c7f7449e03258a7b4daa9bdbf");
 
-            List<Flight> flights = GetFlights(response);
+            List <Flight> flights = GetFlights(response);
 
             Dictionary<string, string> citiesWithPrices = await GetCitiesWithPrices(flights);
 
@@ -94,7 +92,7 @@ namespace FlightApi.Controllers
         [HttpPost("filter")]
         public async Task<ActionResult<IEnumerable<Flight>>> PostFlight(Flight flight)
         {
-            string path = UrlBuilder(flight.Origin,
+            string path = Util.Util.UrlBuilder(flight.Origin,
                                         flight.Destination,
                                         flight.DepartDate,
                                         flight.ReturnDate,
@@ -169,33 +167,15 @@ namespace FlightApi.Controllers
             return flight;
         }
 
-        //method for building the url
-        private string UrlBuilder(string origin, string destination, string departDate, string returnDate, string currency, string tripClass, string sorting)
-        {
-            StringBuilder UrlSb = new StringBuilder();
-            UrlSb.Append("http://api.travelpayouts.com/v2/prices/nearest-places-matrix?");
-            UrlSb.Append($"origin={origin}&");
-            UrlSb.Append($"destination={destination}&");
-
-            if (departDate != null && departDate != string.Empty)
-            {
-                UrlSb.Append($"depart_date={departDate}&");
-            }
-
-            if (returnDate != null && returnDate != string.Empty)
-            {
-                UrlSb.Append($"return_date={returnDate}&");
-            }
-
-            UrlSb.Append("token=35120b8381d8f9ecea3fbd296b0697c3");
-            string result = UrlSb.ToString();
-            return result;
-        }
-
         private async Task<Dictionary<string, string>> GetCitiesWithPrices(List<Flight> flights)
         {
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("x-rapidapi-key", "033ea2f472msh7c7d1b40c8172acp1c5f99jsn3001eb77120e");
+
+            Dictionary<string, string> requestHeaders = new Dictionary<string, string>()
+            {
+                { "x-rapidapi-key", "033ea2f472msh7c7d1b40c8172acp1c5f99jsn3001eb77120e" }
+            };
 
             Dictionary<string, string> citiesWithPrices = new Dictionary<string, string>();
 
@@ -206,7 +186,7 @@ namespace FlightApi.Controllers
 
             for (int i = counter; i < maxAmountOfCities; i++)
             {
-                (string city, string price) = await CreateCityWithPrice(httpClient, flights[i]);
+                (string city, string price) = await CreateCityWithPrice(requestHeaders, flights[i]);
 
                 citiesWithPrices.Add(city, price);
             }
@@ -214,11 +194,12 @@ namespace FlightApi.Controllers
             return citiesWithPrices;
         }
 
-        private async Task<(string, string)> CreateCityWithPrice(HttpClient httpClient, Flight flight)
+        private async Task<(string, string)> CreateCityWithPrice(Dictionary<string, string> requestHeaders, Flight flight)
         {
             var destination = flight.Destination;
 
-            var resp = await httpClient.GetStringAsync("https://airport-info.p.rapidapi.com/airport?iata=" + destination);
+            string resp = await HttpService.HandleHttpGetRequest("https://airport-info.p.rapidapi.com/airport?iata=" + destination, requestHeaders);
+
             JObject jsonResp = JObject.Parse(resp);
 
             var fullCityName = jsonResp["location"].ToString();
