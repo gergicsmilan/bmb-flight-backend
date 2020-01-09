@@ -35,7 +35,7 @@ namespace FlightApi.Controllers
                 await httpClient.GetStringAsync(
                     "http://api.travelpayouts.com/v1/city-directions?origin=BUD&currency=huf&token=3e08147c7f7449e03258a7b4daa9bdbf");
             
-            var flights = new List<Flight>();
+            List<Flight> flights = new List<Flight>();
 
             JObject jsonResponse = JObject.Parse(response);
             foreach (JToken jToken in jsonResponse["data"].Children())
@@ -45,10 +45,7 @@ namespace FlightApi.Controllers
                 flights.Add(flight);
             }
 
-
-            int amountOfCities = flights.Count();
-
-            Dictionary<string, string> citiesWithPrices = await GetCitiesWithPrices(amountOfCities, flights);
+            Dictionary<string, string> citiesWithPrices = await GetCitiesWithPrices(flights);
 
             return citiesWithPrices;
         }
@@ -206,13 +203,14 @@ namespace FlightApi.Controllers
             return result;
         }
 
-        private async Task<Dictionary<string, string>> GetCitiesWithPrices(int amountOfCities, List<Flight> flights)
+        private async Task<Dictionary<string, string>> GetCitiesWithPrices(List<Flight> flights)
         {
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("x-rapidapi-key", "033ea2f472msh7c7d1b40c8172acp1c5f99jsn3001eb77120e");
 
             Dictionary<string, string> citiesWithPrices = new Dictionary<string, string>();
 
+            int amountOfCities = flights.Count;
             int maxAmountOfCities = 6;
 
             var counter = amountOfCities >= maxAmountOfCities ? 0 : maxAmountOfCities - amountOfCities;
