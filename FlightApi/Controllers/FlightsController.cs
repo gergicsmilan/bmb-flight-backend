@@ -34,16 +34,8 @@ namespace FlightApi.Controllers
             string response =
                 await httpClient.GetStringAsync(
                     "http://api.travelpayouts.com/v1/city-directions?origin=BUD&currency=huf&token=3e08147c7f7449e03258a7b4daa9bdbf");
-            
-            List<Flight> flights = new List<Flight>();
 
-            JObject jsonResponse = JObject.Parse(response);
-            foreach (JToken jToken in jsonResponse["data"].Children())
-            {
-                Flight flight = jToken.First.ToObject<Flight>();
-
-                flights.Add(flight);
-            }
+            List<Flight> flights = GetFlights(response);
 
             Dictionary<string, string> citiesWithPrices = await GetCitiesWithPrices(flights);
 
@@ -252,6 +244,21 @@ namespace FlightApi.Controllers
             var price = flight.Price;
 
             return (city, price);
+        }
+
+        private List<Flight> GetFlights(string response)
+        {
+            List<Flight> flights = new List<Flight>();
+
+            JObject jsonResponse = JObject.Parse(response);
+            foreach (JToken jToken in jsonResponse["data"].Children())
+            {
+                Flight flight = jToken.First.ToObject<Flight>();
+
+                flights.Add(flight);
+            }
+
+            return flights;
         }
 
         private bool FlightExists(long id)
