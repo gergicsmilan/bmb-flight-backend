@@ -26,7 +26,7 @@ namespace FlightApi.Controllers
             _context = context;
         }
 
-        // GET: api/Flights
+        // GET: /api
         [HttpGet]
         public async Task<ActionResult<Dictionary<string, string>>> GetPopularFlights()
         {
@@ -42,7 +42,7 @@ namespace FlightApi.Controllers
             return citiesWithPrices;
         }
 
-        // GET: api/Flights/5
+        // GET: api/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Flight>> GetFlight(long id)
         {
@@ -56,7 +56,7 @@ namespace FlightApi.Controllers
             return flight;
         }
 
-        // PUT: api/Flights/5
+        // PUT: api/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
@@ -88,7 +88,7 @@ namespace FlightApi.Controllers
             return NoContent();
         }
 
-        // POST: api/Flights
+        // POST: api/filter
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost("filter")]
@@ -131,7 +131,7 @@ namespace FlightApi.Controllers
             return flights;
         }
 
-        // DELETE: api/Flights/5
+        // DELETE: api/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Flight>> DeleteFlight(long id)
         {
@@ -186,9 +186,6 @@ namespace FlightApi.Controllers
             {
                 UrlSb.Append($"return_date={returnDate}&");
             }
-            //UrlSb.Append($"trip_class={tripClass}&");
-            //UrlSb.Append($"sorting={sorting}&");
-            //UrlSb.Append($"currency={currency}&");
 
             UrlSb.Append("token=35120b8381d8f9ecea3fbd296b0697c3");
             string result = UrlSb.ToString();
@@ -213,21 +210,6 @@ namespace FlightApi.Controllers
 
                 citiesWithPrices.Add(city, price);
             }
-
-            //foreach (var flight in flights)
-            //{
-            //    if (amountOfCitiesToShow < maxAmountOfCities)
-            //    {
-            //        (string city, string price) = await CreateCityWithPrice(httpClient, flight);
-
-            //        citiesWithPrices.Add(city, price);
-            //        amountOfCitiesToShow++;
-            //    }
-            //    else
-            //    {
-            //        break;
-            //    }
-            //}
 
             return citiesWithPrices;
         }
