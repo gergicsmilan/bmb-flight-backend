@@ -212,14 +212,7 @@ namespace FlightApi.Controllers
             {
                 if (counter < maxAmountOfCities)
                 {
-                    var destination = flight.First["destination"];
-
-                    var resp = await httpClient.GetStringAsync("https://airport-info.p.rapidapi.com/airport?iata=" + destination);
-                    JObject jsonResp = JObject.Parse(resp);
-
-                    var fullCityName = jsonResp["location"].ToString();
-                    var city = fullCityName.Substring(0, fullCityName.IndexOf(','));
-                    var price = flight.First["price"].ToString();
+                    (string city, string price) = await CreateCityWithPrice(httpClient, flight);
 
                     citiesWithPrices.Add(city, price);
                     counter++;
@@ -231,6 +224,20 @@ namespace FlightApi.Controllers
             }
 
             return citiesWithPrices;
+        }
+
+        private async Task<(string, string)> CreateCityWithPrice(HttpClient httpClient, JToken flight)
+        {
+            var destination = flight.First["destination"];
+
+            var resp = await httpClient.GetStringAsync("https://airport-info.p.rapidapi.com/airport?iata=" + destination);
+            JObject jsonResp = JObject.Parse(resp);
+
+            var fullCityName = jsonResp["location"].ToString();
+            var city = fullCityName.Substring(0, fullCityName.IndexOf(','));
+            var price = flight.First["price"].ToString();
+
+            return (city, price);
         }
 
         private bool FlightExists(long id)
