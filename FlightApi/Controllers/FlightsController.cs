@@ -29,13 +29,13 @@ namespace FlightApi.Controllers
 
         // GET: /api
         [HttpGet]
-        public async Task<ActionResult<Dictionary<string, string>>> GetPopularFlights()
+        public async Task<ActionResult<List<Dictionary<string, string>>>> GetPopularFlights()
         {
             string response = await HttpService.HandleHttpGetRequest("http://api.travelpayouts.com/v1/city-directions?origin=BUD&currency=huf&token=3e08147c7f7449e03258a7b4daa9bdbf");
 
             List <Flight> flights = GetFlights(response);
 
-            Dictionary<string, string> citiesWithPrices = await GetCitiesWithPrices(flights);
+            List<Dictionary<string, string>> citiesWithPrices = await GetCitiesWithPrices(flights);
 
             return citiesWithPrices;
         }
@@ -167,7 +167,7 @@ namespace FlightApi.Controllers
             return flight;
         }
 
-        private async Task<Dictionary<string, string>> GetCitiesWithPrices(List<Flight> flights)
+        private async Task<List<Dictionary<string, string>>> GetCitiesWithPrices(List<Flight> flights)
         {
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("x-rapidapi-key", "033ea2f472msh7c7d1b40c8172acp1c5f99jsn3001eb77120e");
@@ -177,7 +177,7 @@ namespace FlightApi.Controllers
                 { "x-rapidapi-key", "033ea2f472msh7c7d1b40c8172acp1c5f99jsn3001eb77120e" }
             };
 
-            Dictionary<string, string> citiesWithPrices = new Dictionary<string, string>();
+            List<Dictionary<string, string>> citiesWithPrices = new List<Dictionary<string, string>>();
 
             int amountOfCities = flights.Count;
             int maxAmountOfCities = 6;
@@ -186,9 +186,14 @@ namespace FlightApi.Controllers
 
             for (int i = counter; i < maxAmountOfCities; i++)
             {
+                Dictionary<string, string> cityData = new Dictionary<string, string>();
+
                 (string city, string price) = await CreateCityWithPrice(requestHeaders, flights[i]);
 
-                citiesWithPrices.Add(city, price);
+                cityData["cityName"] = city;
+                cityData["price"] = price;
+
+                citiesWithPrices.Add(cityData);
             }
 
             return citiesWithPrices;
